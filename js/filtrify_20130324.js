@@ -8,6 +8,9 @@
  * https://github.com/luis-almeida
  */
 
+
+// Select2 Version
+
 ;(function ( $, window, document, undefined ) {
 
 	var defaults = {
@@ -65,7 +68,7 @@
 			for ( i = 0 ; i < attr.length; i++ ) {
 				name = attr[i].name;
 				if ( name.indexOf( "data-" ) === 0 && $.inArray( name, this.options.block ) === -1 ) {
-					field = name.replace(/data-/gi, "").replace(/-/gi, " ").split(' ').join('_');
+					field = name.replace(/data-/gi, "").replace(/-/gi, " ");
 					tags = element.getAttribute( name ).split(", ");
 					data[field] = tags;
 
@@ -95,14 +98,13 @@
 
 //		this._menu.list = $("<ul class='ft-menu' />");
 		this._menu.list = $("<div class='ft-menu' />");
-
+		
 		for ( f; f < this._order.length; f++ ) {
 			field = browser.webkit || browser.opera ? 
 				this._order[f] : this._order[ this._order.length - f - 1 ];
 			this._menu[ field ] = {};
 			this.build( field );
 			this.cache( field );
-//			this.select2( field );
 			this.events( field );
 			this.append( field );
 			this.query( field );
@@ -116,36 +118,32 @@
 //		for ( g; g < this._order.length; g++ ) {
 //			field2 = browser.webkit || browser.opera ? 
 //					this._order[g] : this._order[ this._order.length - g - 1 ];
-//			$("#" + field2 ).select2({
-//				placeholder: field2.split('_').join(' ')
+//			$("#" + field2.split(' ').join('_') ).select2({
+//				placeholder: field2
 //			});
 //			
 //			$("#" + field2.split(' ').join('_') ).on("change", function(e) { 
-//				log(JSON.stringify({val:e.val, added:e.added, removed:e.removed}));
-//				Filtrify.prototype.select( f, e.added.element[0].id );
+//				log(JSON.stringify({val:e.val, added:e.added, removed:e.removed})); 
 //			});
 //			
 //		};
-		
 	};
-
+	
+	
 	function log(e) {
 		var e=$("<li>"+e+"</li>");
 		$("#select2_log").append(e);
 		e.animate({opacity:1}, 10000, 'linear', function() { e.animate({opacity:0}, 2000, 'linear', function() {e.remove(); }); });
 		}
+
+	
+	
 	
 	Filtrify.prototype.build = function ( f ) {
 		var html, t, tag, tags = [];
-			
-//		html = "<li class='ft-field'>" + 
-//		"<span class='ft-label'>" + f + "</span>" + 
-//		"<div class='ft-panel ft-hidden'>" +
-//		"<ul class='ft-selected' style='display:none;'></ul>" +
-//		"<fieldset class='ft-search'><input type='text' placeholder='Search' /></fieldset>" +
-//		"<ul class='ft-tags'>";
-		html = "<select id='" + f + "' multiple class='ft-field' style='width:300px'>";
 		
+		html = "<select multiple class='ft-field' id='" + f.split(' ').join('_') + "' style='width:300px'>";
+
 		for ( tag in this._fields[f] ) {
 			tags.push( tag );
 		};
@@ -154,37 +152,27 @@
 
 		for ( t = 0; t < tags.length; t++ ) {
 			tag = tags[t];
-//			html += "<li data-count='" + this._fields[f][tag] + "' >" + tag + "</li>";
-			html += "<option id='" + tag + "' data-count='" + this._fields[f][tag] + "' >" + tag + " (" + this._fields[f][tag] + ")</option>";
+			html += "<option data-count='" + this._fields[f][tag] + "' >" + tag + " (" + this._fields[f][tag] + ")</option>";
 		};
 
-//		html += "</ul><div class='ft-mismatch ft-hidden'></div></div></li>";
-		html += "</select>";
-
+		html += "</select><div class='ft-mismatch ft-hidden'></div></div>";
+		
+		
 		this._menu[f].item = $(html);
 	};
 
 	Filtrify.prototype.cache = function ( f ) {
-//		this._menu[f].label = this._menu[f].item.find("span.ft-label");
-//		this._menu[f].panel = this._menu[f].item.find("div.ft-panel");
-//		this._menu[f].selected = this._menu[f].item.find("ul.ft-selected");
-//		this._menu[f].search = this._menu[f].item.find("fieldset.ft-search");
-		
-//		this._menu[f].tags = this._menu[f].item.find("ul.ft-tags");
-		this._menu[f].tags = this._menu[f].item;
-		
-//		this._menu[f].mismatch = this._menu[f].item.find("div.ft-mismatch");
-		
+		this._menu[f].label = this._menu[f].item.find("span.ft-label");
+		this._menu[f].panel = this._menu[f].item.find("div.ft-panel");
+		this._menu[f].selected = this._menu[f].item.find("ul.ft-selected");
+		this._menu[f].search = this._menu[f].item.find("fieldset.ft-search");
+		this._menu[f].tags = this._menu[f].item.find("ul.ft-tags");
+		this._menu[f].mismatch = this._menu[f].item.find("div.ft-mismatch");
+
 		this._menu[f].highlight = $([]);
 		this._menu[f].active = $([]);
 	};
 
-	Filtrify.prototype.select2 = function ( f ) {
-		this._menu[f].tags.select2({
-				placeholder: f
-			});
-	};
-	
 	Filtrify.prototype.append = function ( f ) {
 		this._menu.list.append( this._menu[f].item );
 	};
@@ -195,141 +183,140 @@
 
 	Filtrify.prototype.events = function ( f ) {
 
-//		$( document ).on("click", this._bind(function(){
-//			this.closePanel( f );
-//		}, this) );
-//
-//		this._menu[f].panel.on("click", this._bind(function(event){
-//			event.stopPropagation();
-//		}, this) );
-//
-//		this._menu[f].panel.on("mouseenter", this._bind(function(){
-//			this.bringToFront( f );
-//		}, this) );
-//
-//		this._menu[f].label.on("click", this._bind(function(event){
-//			this.openPanel( f );
-//			this.bringToFront( f );
-//			event.stopPropagation();
-//		}, this) );
-//
-//		this._menu[f].search.on( "keyup", "input", this._bind(function(event){
-//
-//			if ( event.which === 38 || event.which === 40 ) { 
-//				return false; 
-//			} else if ( event.which === 13 ) {
-//				if ( this._menu[f].highlight.length ) {
-//					this.select( f );
-//					this.filter();
-//				};
-//			} else {
-//				this.search( f, event.target.value );
-//			};
-//
-//		}, this) );
-//
-//		this._menu[f].search.on( "keydown", "input", this._bind(function(event){
-//
-//			if( event.which === 40 ) {
-//				this.moveHighlight( f, "down" );
-//				event.preventDefault();
-//			} else if ( event.which === 38 ) {
-//				this.moveHighlight( f, "up" );
-//				event.preventDefault();
-//			};
-//
-//		}, this) );
-//		
-//		this._menu[f].tags.on( "mouseenter", "li", this._bind(function(event){
-//			this.highlight( f, $( event.target ) );
-//		}, this) );
-//		
-//		this._menu[f].tags.on( "mouseleave", "li", this._bind(function(){
-//			this.clearHighlight( f );
-//		}, this ) );
+		$( document ).on("click", this._bind(function(){
+			this.closePanel( f );
+		}, this) );
 
-//		this._menu[f].tags.on( "click", "li", this._bind(function(){
-		this._menu[f].tags.on( "click", "option", this._bind(function(){
+		this._menu[f].panel.on("click", this._bind(function(event){
+			event.stopPropagation();
+		}, this) );
+
+		this._menu[f].panel.on("mouseenter", this._bind(function(){
+			this.bringToFront( f );
+		}, this) );
+
+		this._menu[f].label.on("click", this._bind(function(event){
+			this.openPanel( f );
+			this.bringToFront( f );
+			event.stopPropagation();
+		}, this) );
+
+		this._menu[f].search.on( "keyup", "input", this._bind(function(event){
+
+			if ( event.which === 38 || event.which === 40 ) { 
+				return false; 
+			} else if ( event.which === 13 ) {
+				if ( this._menu[f].highlight.length ) {
+					this.select( f );
+					this.filter();
+				};
+			} else {
+				this.search( f, event.target.value );
+			};
+
+		}, this) );
+
+		this._menu[f].search.on( "keydown", "input", this._bind(function(event){
+
+			if( event.which === 40 ) {
+				this.moveHighlight( f, "down" );
+				event.preventDefault();
+			} else if ( event.which === 38 ) {
+				this.moveHighlight( f, "up" );
+				event.preventDefault();
+			};
+
+		}, this) );
+
+		this._menu[f].tags.on( "mouseenter", "li", this._bind(function(event){
+			this.highlight( f, $( event.target ) );
+		}, this) );
+
+		this._menu[f].tags.on( "mouseleave", "li", this._bind(function(){
+			this.clearHighlight( f );
+		}, this ) );
+
+		this._menu[f].tags.on( "click", "li", this._bind(function(){
 			this.select( f );
 			this.filter();
 		}, this) );
 
-//		this._menu[f].selected.on( "click", "li", this._bind(function(event){
-//			this.unselect( f, $( event.target ).text() );
-//			this.filter();
-//		}, this) );
+		this._menu[f].selected.on( "click", "li", this._bind(function(event){
+			this.unselect( f, $( event.target ).text() );
+			this.filter();
+		}, this) );
 
 	};
 
-//	Filtrify.prototype.bringToFront = function ( f ) {
-//		this._z = this._z + 1;
-//		this._menu[f].panel.css("z-index", this._z);
-//		this._menu[f].search.find("input").focus();
-//	};
-//
-//	Filtrify.prototype.openPanel = function ( f ) {
-//		this._menu[f].label.toggleClass("ft-opened");
-//		this._menu[f].panel.toggleClass("ft-hidden");
-//		this._menu[f].search.find("input").focus();
-//	};
-//
-//	Filtrify.prototype.closePanel = function ( f ) {
-//		this.resetSearch( f );
-//		this._menu[f].panel.addClass("ft-hidden");
-//		this._menu[f].label.removeClass("ft-opened");
-//	};
-//
-//	Filtrify.prototype.preventOverflow = function ( f ) {
-//		var high_bottom, high_top, maxHeight, visible_bottom, visible_top;
-//
-//		maxHeight = parseInt(this._menu[f].tags.css("maxHeight"), 10);
-//		visible_top = this._menu[f].tags.scrollTop();
-//		visible_bottom = maxHeight + visible_top;
-//		high_top = this._menu[f].highlight.position().top + this._menu[f].tags.scrollTop();
-//		high_bottom = high_top + this._menu[f].highlight.outerHeight();
-//		if (high_bottom >= visible_bottom) {
-//			return this._menu[f].tags.scrollTop((high_bottom - maxHeight) > 0 ? high_bottom - maxHeight : 0);
-//		} else if (high_top < visible_top) {
-//			return this._menu[f].tags.scrollTop(high_top);
-//		}
-//	};
-//
-//	Filtrify.prototype.moveHighlight = function ( f, direction ) {
-//		if ( this._menu[f].highlight.length ) {
-//			var method = direction === "down" ? "nextAll" : "prevAll",
-//				next = this._menu[f].highlight[method](":visible:first");
-//			if ( next.length ) {
-//				this.clearHighlight( f );
-//				this.highlight( f, next );
-//				this.preventOverflow( f );
-//			};
-//		} else {
-//			this.highlight( f, this._menu[f].tags.children(":visible:first") );
-//			this.preventOverflow( f );
-//		};
-//	};
-//
-//	Filtrify.prototype.highlight = function ( f, elem ) {
-//		this._menu[f].highlight = elem;
-//		this._menu[f].highlight.addClass("ft-highlight");
-//	};
-//
-//	Filtrify.prototype.removeHighlight = function ( f ) {
-//		this._menu[f].highlight.removeClass("ft-highlight");
-//	};
-//
-//	Filtrify.prototype.hideHighlight = function ( f ) {
-//		this._menu[f].highlight.addClass("ft-hidden");
-//	};
-//
-//	Filtrify.prototype.resetHighlight = function ( f ) {
-//		this._menu[f].highlight = $([]);
-//	};
-//
-//	Filtrify.prototype.clearHighlight = function ( f ) {
-//		this.removeHighlight( f );
-//		this.resetHighlight( f );
-//	};
+	Filtrify.prototype.bringToFront = function ( f ) {
+		this._z = this._z + 1;
+		this._menu[f].panel.css("z-index", this._z);
+		this._menu[f].search.find("input").focus();
+	};
+
+	Filtrify.prototype.openPanel = function ( f ) {
+		this._menu[f].label.toggleClass("ft-opened");
+		this._menu[f].panel.toggleClass("ft-hidden");
+		this._menu[f].search.find("input").focus();
+	};
+
+	Filtrify.prototype.closePanel = function ( f ) {
+		this.resetSearch( f );
+		this._menu[f].panel.addClass("ft-hidden");
+		this._menu[f].label.removeClass("ft-opened");
+	};
+
+	Filtrify.prototype.preventOverflow = function ( f ) {
+		var high_bottom, high_top, maxHeight, visible_bottom, visible_top;
+
+		maxHeight = parseInt(this._menu[f].tags.css("maxHeight"), 10);
+		visible_top = this._menu[f].tags.scrollTop();
+		visible_bottom = maxHeight + visible_top;
+		high_top = this._menu[f].highlight.position().top + this._menu[f].tags.scrollTop();
+		high_bottom = high_top + this._menu[f].highlight.outerHeight();
+		if (high_bottom >= visible_bottom) {
+			return this._menu[f].tags.scrollTop((high_bottom - maxHeight) > 0 ? high_bottom - maxHeight : 0);
+		} else if (high_top < visible_top) {
+			return this._menu[f].tags.scrollTop(high_top);
+		}
+	};
+
+	Filtrify.prototype.moveHighlight = function ( f, direction ) {
+		if ( this._menu[f].highlight.length ) {
+			var method = direction === "down" ? "nextAll" : "prevAll",
+				next = this._menu[f].highlight[method](":visible:first");
+			if ( next.length ) {
+				this.clearHighlight( f );
+				this.highlight( f, next );
+				this.preventOverflow( f );
+			};
+		} else {
+			this.highlight( f, this._menu[f].tags.children(":visible:first") );
+			this.preventOverflow( f );
+		};
+	};
+
+	Filtrify.prototype.highlight = function ( f, elem ) {
+		this._menu[f].highlight = elem;
+		this._menu[f].highlight.addClass("ft-highlight");
+	};
+
+	Filtrify.prototype.removeHighlight = function ( f ) {
+		this._menu[f].highlight.removeClass("ft-highlight");
+	};
+
+	Filtrify.prototype.hideHighlight = function ( f ) {
+		this._menu[f].highlight.addClass("ft-hidden");
+	};
+
+	Filtrify.prototype.resetHighlight = function ( f ) {
+		this._menu[f].highlight = $([]);
+	};
+
+	Filtrify.prototype.clearHighlight = function ( f ) {
+		this.removeHighlight( f );
+		this.resetHighlight( f );
+	};
 
 	Filtrify.prototype.showMismatch = function ( f, txt ) {
 		this._menu[f].mismatch
@@ -341,20 +328,20 @@
 		this._menu[f].mismatch.addClass("ft-hidden");
 	};
 
-//	Filtrify.prototype.search = function ( f, txt ) {
-//		this.clearHighlight( f );
-//		this.showResults( f, txt );
-//		this.highlight( f, this._menu[f].tags.children(":visible:first") );
-//	};
-//
-//	Filtrify.prototype.resetSearch = function ( f ) {
-//		this._menu[f].search.find("input").val("");
-//		this._menu[f].tags.children()
-//			.not(this._menu[f].active)
-//			.removeClass("ft-hidden");
-//
-//		this.hideMismatch( f );
-//	};
+	Filtrify.prototype.search = function ( f, txt ) {
+		this.clearHighlight( f );
+		this.showResults( f, txt );
+		this.highlight( f, this._menu[f].tags.children(":visible:first") );
+	};
+
+	Filtrify.prototype.resetSearch = function ( f ) {
+		this._menu[f].search.find("input").val("");
+		this._menu[f].tags.children()
+			.not(this._menu[f].active)
+			.removeClass("ft-hidden");
+
+		this.hideMismatch( f );
+	};
 
 	Filtrify.prototype.showResults = function ( f, txt ) {
 		var results = 0;
@@ -379,20 +366,18 @@
 	};
 
 	Filtrify.prototype.select = function ( f ) {
-//		this.updateQueryTags( f, this._menu[f].highlight.text() );
-		this.updateQueryTags( f, $("#" + f + " option").filter(":selected:last").attr("id") );
-//		this.updateQueryTags( f, g );
-//		this.updateActiveClass( f );
-//		this.removeHighlight( f );
-//		this.appendToSelected( f );
-//		this.addToActive( f );
-//		this.hideHighlight( f );
-//		this.resetHighlight( f );
-//		this.resetSearch( f );
+		this.updateQueryTags( f, this._menu[f].highlight.text() );
+		this.updateActiveClass( f );
+		this.removeHighlight( f );
+		this.appendToSelected( f );
+		this.addToActive( f );
+		this.hideHighlight( f );
+		this.resetHighlight( f );
+		this.resetSearch( f );
 
-//		if ( this.options.close ) {
-//			this.closePanel( f );
-//		};
+		if ( this.options.close ) {
+			this.closePanel( f );
+		};
 	};
 
 	Filtrify.prototype.updateQueryTags = function ( f, tag ) {
@@ -405,27 +390,27 @@
 		};
 	};
 
-//	Filtrify.prototype.updateActiveClass = function ( f ) {
-//		if ( this._query[f].length ) {
-//			this._menu[f].label.addClass("ft-active");
-//		} else {
-//			this._menu[f].label.removeClass("ft-active");
-//		};
-//	};
-//
-//	Filtrify.prototype.appendToSelected = function ( f ) {
-//		this._menu[f].selected.append( this._menu[f].highlight.clone() );
-//		this.slideSelected( f );
-//	};
-//
-//	Filtrify.prototype.addToActive = function ( f ) {
-//		this._menu[f].active = this._menu[f].active.add( this._menu[f].highlight );
-//	};
+	Filtrify.prototype.updateActiveClass = function ( f ) {
+		if ( this._query[f].length ) {
+			this._menu[f].label.addClass("ft-active");
+		} else {
+			this._menu[f].label.removeClass("ft-active");
+		};
+	};
+
+	Filtrify.prototype.appendToSelected = function ( f ) {
+		this._menu[f].selected.append( this._menu[f].highlight.clone() );
+		this.slideSelected( f );
+	};
+
+	Filtrify.prototype.addToActive = function ( f ) {
+		this._menu[f].active = this._menu[f].active.add( this._menu[f].highlight );
+	};
 
 	Filtrify.prototype.unselect = function ( f, tag ) {
 		this.updateQueryTags( f, tag );
-//		this.removeFromSelected( f, tag );
-//		this.removeFromActive( f, tag );
+		this.removeFromSelected( f, tag );
+		this.removeFromActive( f, tag );
 		this.updateActiveClass( f );
 		this.resetSearch( f );
 	};
@@ -441,19 +426,19 @@
 		this.slideSelected( f );
 	};
 
-//	Filtrify.prototype.removeFromActive = function ( f, tag ) {
-//		this._menu[f].active = this._menu[f].active.filter(function() { 
-//			return ( this.textContent || this.innerText ) !== tag; 
-//		});
-//	};
-//
-//	Filtrify.prototype.slideSelected = function ( f ) {
-//		if ( this._menu[f].selected.children().length ) {
-//			this._menu[f].selected.slideDown("fast");
-//		} else {
-//			this._menu[f].selected.slideUp("fast");
-//		};
-//	};
+	Filtrify.prototype.removeFromActive = function ( f, tag ) {
+		this._menu[f].active = this._menu[f].active.filter(function() { 
+			return ( this.textContent || this.innerText ) !== tag; 
+		});
+	};
+
+	Filtrify.prototype.slideSelected = function ( f ) {
+		if ( this._menu[f].selected.children().length ) {
+			this._menu[f].selected.slideDown("fast");
+		} else {
+			this._menu[f].selected.slideUp("fast");
+		};
+	};
 
 	Filtrify.prototype.filter = function () {
 		var f, r, t, c, m;
