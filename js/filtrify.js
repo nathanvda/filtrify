@@ -102,14 +102,20 @@
 			this._menu[ field ] = {};
 			this.build( field );
 			this.cache( field );
-//			this.select2( field );
 			this.events( field );
 			this.append( field );
 			this.query( field );
 		};
 
 		this._holder.html( this._menu.list );
-		
+
+        // activate select2 after it was added to DOM
+        for ( f=0; f < this._order.length; f++ ) {
+            field = browser.webkit || browser.opera ?
+                this._order[f] : this._order[ this._order.length - f - 1 ];
+            this.select2(field);
+        };
+
 //		// After all elements are placed on the screen, add the select2 specifics
 //		var g = 0, field2;
 //
@@ -180,9 +186,11 @@
 	};
 
 	Filtrify.prototype.select2 = function ( f ) {
-		this._menu[f].tags.select2({
-				placeholder: f
-			});
+		//this._menu[f].tags.select2({
+		//		placeholder: f
+		//	});
+        console.log('select2::' + JSON.stringify(f));
+        $('#' + f).select2();
 	};
 	
 	Filtrify.prototype.append = function ( f ) {
